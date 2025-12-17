@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Product Catalog</title>
+    <title>E-Commerce Demo</title>
     <style>
         :root{
           --bg:#0b1020;
@@ -61,7 +61,7 @@
           padding:10px 12px;
           outline:none;
         }
-        .input{min-width:260px}
+        .input{min-width:240px}
         .select{min-width:170px}
         .btn{
           cursor:pointer;
@@ -77,6 +77,7 @@
           border:1px solid var(--border);
           color:var(--muted);
           background: rgba(255,255,255,.03);
+          white-space:nowrap;
         }
 
         main{padding:18px 0 48px}
@@ -156,9 +157,9 @@
         }
         .error{border-color: rgba(255,120,120,.35); color: rgba(255,200,200,.92)}
 
-        /* Modal */
+        /* Dialogs */
         dialog{
-          width:min(880px, 92vw);
+          width:min(900px, 92vw);
           border:none;
           border-radius: 22px;
           padding:0;
@@ -202,11 +203,22 @@
           padding:10px 12px;
           cursor:pointer;
           font-weight:700;
+          text-decoration:none;
+          display:inline-block;
+          text-align:center;
         }
         .accent{
           border-color: rgba(122,162,255,.35);
           background: rgba(122,162,255,.14);
         }
+
+        .two-cols{
+          display:grid;
+          grid-template-columns: 1fr 1fr;
+          gap:14px;
+          margin-top:14px;
+        }
+        @media (max-width: 780px){ .two-cols{grid-template-columns:1fr;} }
     </style>
 </head>
 
@@ -217,12 +229,16 @@
             <div class="brand">
                 <div class="logo" aria-hidden="true"></div>
                 <div>
-                    <div>Product Catalog</div>
-                    <div class="subtitle">Spring Boot + SQLite · Static images from <code>/images</code></div>
+                    <div>E-Commerce Demo</div>
+                    <div class="subtitle">Products + User/Auth (Register/Login) · Static images from <code>/images</code></div>
                 </div>
             </div>
 
             <div class="controls">
+                <span id="authStatus" class="pill">Not logged in</span>
+                <button id="openAuth" class="btn">Register / Login</button>
+                <button id="logoutBtn" class="btn" style="display:none;">Logout</button>
+
                 <input id="search" class="input" placeholder="Search products (name / brand / category)..." />
                 <select id="category" class="select">
                     <option value="">All categories</option>
@@ -240,6 +256,7 @@
     </div>
 </main>
 
+<!-- Product detail dialog -->
 <dialog id="detailDialog">
     <div class="modal">
         <div class="modal-img"><img id="dImg" alt=""></div>
@@ -266,12 +283,87 @@
     </div>
 </dialog>
 
+<!-- Auth dialog -->
+<dialog id="authDialog">
+    <div style="padding:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+            <div style="font-weight:800; font-size:18px;">Account</div>
+            <button class="close" id="authClose">Close</button>
+        </div>
+
+        <div class="two-cols">
+            <!-- Register -->
+            <div style="border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:14px;">
+                <div style="font-weight:800; margin-bottom:10px;">Register</div>
+
+                <input id="rEmail" class="input" placeholder="Email" style="width:100%; margin-bottom:8px;" />
+                <input id="rPassword" class="input" placeholder="Password" type="password" style="width:100%; margin-bottom:8px;" />
+                <input id="rFirst" class="input" placeholder="First name" style="width:100%; margin-bottom:8px;" />
+                <input id="rLast" class="input" placeholder="Last name" style="width:100%; margin-bottom:10px;" />
+
+                <button id="registerBtn" class="btn" style="width:100%;">Create account</button>
+            </div>
+
+            <!-- Login -->
+            <div style="border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:14px;">
+                <div style="font-weight:800; margin-bottom:10px;">Login</div>
+
+                <input id="lEmail" class="input" placeholder="Email" style="width:100%; margin-bottom:8px;" />
+                <input id="lPassword" class="input" placeholder="Password" type="password" style="width:100%; margin-bottom:10px;" />
+
+                <button id="loginBtn" class="btn" style="width:100%;">Login</button>
+            </div>
+        </div>
+
+        <div id="authMsg" class="pill" style="margin-top:12px; display:none;"></div>
+    </div>
+</dialog>
+
 <script>
+    // =========================
+    // ✅ CONFIG (change here)
+    // =========================
 
-    const API_BASE = "http://localhost:8081";
-    const LIST_ENDPOINT = `${API_BASE}/api/product`;
-    const DETAIL_ENDPOINT = (id) => `${API_BASE}/api/products/${id}`;
+    // User/Auth Service (your controller: /api/ecommerce/user)
+    const USER_API_BASE = "http://localhost:8082/api/ecommerce/user";
+    const REGISTER_ENDPOINT = `${USER_API_BASE}/register`;
+    const LOGIN_ENDPOINT    = `${USER_API_BASE}/login`;
+    const USER_KEY = "ecom_user";
 
+    function setUser(user) {
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+    }
+
+    function getUser() {
+      const u = localStorage.getItem(USER_KEY);
+      return u ? JSON.parse(u) : null;
+    }
+
+    function clearUser() {
+      localStorage.removeItem(USER_KEY);
+    }
+
+
+    // Product Service:
+    // - If your product service runs on 8081 and endpoint is /api/product, then keep this.
+    // - If it is /api/products, change it.
+    const PRODUCT_API_BASE = "http://localhost:8081";
+    const PRODUCT_LIST_ENDPOINT = `${PRODUCT_API_BASE}/api/product`; // <-- change if needed
+
+    // Images are served by product service from /images/...
+    // Example: PRODUCT_API_BASE + "/images/tshirt.jpg"
+
+    // =========================
+    // Token storage
+    // =========================
+    const TOKEN_KEY = "ecom_access_token";
+    const getToken  = () => localStorage.getItem(TOKEN_KEY);
+    const setToken  = (t) => localStorage.setItem(TOKEN_KEY, t);
+    const clearToken = () => localStorage.removeItem(TOKEN_KEY);
+
+    // =========================
+    // UI elements
+    // =========================
     const grid = document.getElementById("grid");
     const searchInput = document.getElementById("search");
     const categorySelect = document.getElementById("category");
@@ -292,6 +384,28 @@
     const dId = document.getElementById("dId");
     const openImg = document.getElementById("openImg");
 
+    // Auth UI
+    const authStatus = document.getElementById("authStatus");
+    const openAuth = document.getElementById("openAuth");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    const authDialog = document.getElementById("authDialog");
+    const authClose = document.getElementById("authClose");
+    const authMsg = document.getElementById("authMsg");
+
+    const rEmail = document.getElementById("rEmail");
+    const rPassword = document.getElementById("rPassword");
+    const rFirst = document.getElementById("rFirst");
+    const rLast = document.getElementById("rLast");
+    const registerBtn = document.getElementById("registerBtn");
+
+    const lEmail = document.getElementById("lEmail");
+    const lPassword = document.getElementById("lPassword");
+    const loginBtn = document.getElementById("loginBtn");
+
+    // =========================
+    // Helpers
+    // =========================
     let allProducts = [];
     let categories = [];
 
@@ -306,18 +420,14 @@
     const safeText = (v, fallback="") => (v === null || v === undefined || v === "") ? fallback : String(v);
 
     function buildImageUrl(imageUrl) {
-      // DB: "/images/xxx.jpg" → API_BASE + imageUrl
+      // DB stores "/images/xxx.jpg"
       if (!imageUrl) return "";
       if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) return imageUrl;
-      return `${API_BASE}${imageUrl}`;
+      return `${PRODUCT_API_BASE}${imageUrl}`;
     }
 
     function setState(message, isError=false) {
-      grid.innerHTML = `
-        <div class="state ${isError ? "error":""}">
-          ${message}
-        </div>
-      `;
+      grid.innerHTML = `<div class="state ${isError ? "error":""}">${message}</div>`;
     }
 
     function renderCategories() {
@@ -357,7 +467,8 @@
 
         card.innerHTML = `
           <div class="imgwrap">
-            <img src="${imgSrc}" alt="${safeText(p.name, "Product image")}" onerror="this.style.opacity=.2; this.alt='Image not found';" />
+            <img src="${imgSrc}" alt="${safeText(p.name, "Product image")}"
+                 onerror="this.style.opacity=.2; this.alt='Image not found';" />
           </div>
           <div class="body">
             <div class="name">${safeText(p.name, "Unnamed product")}</div>
@@ -377,20 +488,7 @@
       });
     }
 
-    async function openDetails(listItem) {
-      // Eğer /{id} endpoint'in varsa, oradan detay çekmeye çalışalım.
-      // Yoksa list item ile modal açacağız.
-      let p = listItem;
-
-      try {
-        const res = await fetch(DETAIL_ENDPOINT(listItem.id));
-        if (res.ok) {
-          p = await res.json();
-        }
-      } catch {
-        // detail endpoint yoksa sessiz geç
-      }
-
+    function openDetails(p) {
       const imgSrc = buildImageUrl(p.imageUrl);
 
       dImg.src = imgSrc;
@@ -412,39 +510,151 @@
 
     closeBtn.addEventListener("click", () => dlg.close());
     dlg.addEventListener("click", (e) => {
-      // modal dışına tıklayınca kapanma
       const rect = dlg.getBoundingClientRect();
       const inDialog = rect.top <= e.clientY && e.clientY <= rect.bottom && rect.left <= e.clientX && e.clientX <= rect.right;
       if (!inDialog) dlg.close();
     });
 
-    searchInput.addEventListener("input", renderGrid);
-    categorySelect.addEventListener("change", renderGrid);
-    reloadBtn.addEventListener("click", load);
+    // =========================
+    // Auth logic
+    // =========================
+    function showAuthMsg(text, isError=false) {
+      authMsg.style.display = "inline-block";
+      authMsg.textContent = text;
+      authMsg.style.borderColor = isError ? "rgba(255,120,120,.35)" : "rgba(255,255,255,.12)";
+      authMsg.style.color = isError ? "rgba(255,200,200,.92)" : "var(--muted)";
+    }
 
-    async function load() {
-      setState("Loading products...");
+    function refreshAuthUI() {
+      const token = getToken();
+      const user = getUser();
+
+      if (token && user) {
+        authStatus.textContent = `👤 ${user.email} (${user.role})`;
+        logoutBtn.style.display = "inline-block";
+        openAuth.textContent = "Account";
+      } else {
+        authStatus.textContent = "Not logged in";
+        logoutBtn.style.display = "none";
+        openAuth.textContent = "Register / Login";
+      }
+    }
+
+    openAuth.addEventListener("click", () => authDialog.showModal());
+    authClose.addEventListener("click", () => authDialog.close());
+
+    logoutBtn.addEventListener("click", () => {
+      clearToken();
+      clearUser();
+      refreshAuthUI();
+      showAuthMsg("Logged out.", false);
+    });
+
+    registerBtn.addEventListener("click", async () => {
       try {
-        const res = await fetch(LIST_ENDPOINT);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
+        showAuthMsg("Registering...");
+        const body = {
+          email: (rEmail.value || "").trim(),
+          password: rPassword.value || "",
+          firstName: rFirst.value || "",
+          lastName: rLast.value || ""
+        };
 
+        const res = await fetch(REGISTER_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(`Register failed: HTTP ${res.status} - ${txt}`);
+        }
+
+        const data = await res.json(); // AuthResponse
+        if (data?.accessToken) setToken(data.accessToken);
+
+       setUser({
+        email: data.email,
+        role: data.role
+        });
+
+        refreshAuthUI();
+        showAuthMsg("Registered successfully. Token received.", false);
+        authDialog.close();
+      } catch (e) {
+        showAuthMsg(String(e), true);
+      }
+    });
+
+    loginBtn.addEventListener("click", async () => {
+      try {
+        showAuthMsg("Logging in...");
+        const body = {
+          email: (lEmail.value || "").trim(),
+          password: lPassword.value || ""
+        };
+
+        const res = await fetch(LOGIN_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(`Login failed: HTTP ${res.status} - ${txt}`);
+        }
+
+        const data = await res.json(); // AuthResponse
+        if (data?.accessToken) setToken(data.accessToken);
+
+        setUser({
+        email: data.email,
+        role: data.role
+        });
+
+        refreshAuthUI();
+        showAuthMsg("Logged in successfully. Token received.", false);
+        authDialog.close();
+      } catch (e) {
+        showAuthMsg(String(e), true);
+      }
+    });
+
+    // =========================
+    // Load products
+    // =========================
+    async function loadProducts() {
+      setState(`Loading products...<br><span class="muted">Endpoint: ${PRODUCT_LIST_ENDPOINT}</span>`);
+      try {
+        const res = await fetch(PRODUCT_LIST_ENDPOINT);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
         allProducts = Array.isArray(data) ? data : [];
+
         categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))].sort();
         renderCategories();
         renderGrid();
       } catch (err) {
         setState(
           `Could not load products.<br><br>
-           Check that your backend is running and CORS is configured.<br>
-           <span class="muted">Endpoint: ${LIST_ENDPOINT}</span><br>
+           Check that your product backend is running and CORS is configured.<br>
+           <span class="muted">Endpoint: ${PRODUCT_LIST_ENDPOINT}</span><br>
            <span class="muted">Error: ${String(err)}</span>`,
           true
         );
       }
     }
 
-    load();
+    searchInput.addEventListener("input", renderGrid);
+    categorySelect.addEventListener("change", renderGrid);
+    reloadBtn.addEventListener("click", loadProducts);
+
+    // init
+    refreshAuthUI();
+    loadProducts();
 </script>
 </body>
 </html>
