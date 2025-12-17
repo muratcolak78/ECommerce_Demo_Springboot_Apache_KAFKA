@@ -1,6 +1,7 @@
  E-Commerce Microservices Demo (Java Spring Boot + SQLite + JWT)
 
- ![Uploading 2025-12-1711-41-59-ezgif.com-video-to-gif-converter.gif…]()
+![E-Commerce Microservices Demo](https://github.com/user-attachments/assets/15b94c8a-0c79-4a97-a6ff-aa4d005b0fd6)
+
 
 Projektübersicht
 
