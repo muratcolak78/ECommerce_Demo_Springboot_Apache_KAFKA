@@ -238,13 +238,17 @@
                 <span id="authStatus" class="pill">Not logged in</span>
                 <button id="openAuth" class="btn">Register / Login</button>
                 <button id="logoutBtn" class="btn" style="display:none;">Logout</button>
-
+                <button id="openCart" class="btn">
+                    🛒 Cart <span id="cartCount" class="pill" style="margin-left:8px;">0</span>
+                </button>
                 <input id="search" class="input" placeholder="Search products (name / brand / category)..." />
                 <select id="category" class="select">
                     <option value="">All categories</option>
                 </select>
                 <button id="reload" class="btn">Reload</button>
                 <span id="count" class="pill">0 items</span>
+
+
             </div>
         </div>
     </div>
@@ -318,6 +322,23 @@
         <div id="authMsg" class="pill" style="margin-top:12px; display:none;"></div>
     </div>
 </dialog>
+<dialog id="cartDialog">
+    <div style="padding:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+            <div style="font-weight:800; font-size:18px;">Your Cart</div>
+            <button class="close" id="cartClose">Close</button>
+        </div>
+
+        <div id="cartList" style="margin-top:12px;"></div>
+
+        <div style="display:flex; justify-content:space-between; gap:10px; margin-top:12px;">
+            <button id="clearCartBtn" class="btn">Clear cart</button>
+            <div id="cartTotal" class="pill">Total: 0 €</div>
+        </div>
+
+        <div id="cartMsg" class="pill" style="margin-top:12px; display:none;"></div>
+    </div>
+</dialog>
 
 <script>
     // =========================
@@ -329,6 +350,18 @@
     const REGISTER_ENDPOINT = `${USER_API_BASE}/register`;
     const LOGIN_ENDPOINT    = `${USER_API_BASE}/login`;
     const USER_KEY = "ecom_user";
+
+    // Cart Service
+    const CART_API_BASE = "http://localhost:8083/api/ecommerce/cart";
+
+    const CART_LIST_ENDPOINT   = `${CART_API_BASE}/items`;
+    const CART_ADD_ENDPOINT    = `${CART_API_BASE}/items`;
+    const CART_CLEAR_ENDPOINT  = `${CART_API_BASE}/clear`;
+    const CART_DELETE_ENDPOINT = (productId) => `${CART_API_BASE}/deleteById/${productId}`;
+    const CART_UPDATE_ENDPOINT = (productId) => `${CART_API_BASE}/items/${productId}`;
+
+
+
 
     function setUser(user) {
       localStorage.setItem(USER_KEY, JSON.stringify(user));
@@ -480,10 +513,17 @@
               <span>Stock: <b style="color:var(--text)">${safeText(p.stock, "-")}</b></span>
               <span class="muted">${safeText(p.brand, "")}</span>
             </div>
+            <button class="btn accent add-cart-btn" data-id="${p.id}">
+              Add to Cart
+            </button>
           </div>
         `;
 
-        card.addEventListener("click", () => openDetails(p));
+        card.addEventListener("click", (e) => {
+              if (e.target.closest(".add-cart-btn")) return; // ✅ butonsa detail açma
+              openDetails(p);
+            });
+
         grid.appendChild(card);
       });
     }
@@ -582,6 +622,7 @@
         refreshAuthUI();
         showAuthMsg("Registered successfully. Token received.", false);
         authDialog.close();
+        await refreshCart();
       } catch (e) {
         showAuthMsg(String(e), true);
       }
@@ -631,6 +672,8 @@
         const res = await fetch(PRODUCT_LIST_ENDPOINT);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
+        await refreshCart();
+
         const data = await res.json();
         allProducts = Array.isArray(data) ? data : [];
 
@@ -651,6 +694,194 @@
     searchInput.addEventListener("input", renderGrid);
     categorySelect.addEventListener("change", renderGrid);
     reloadBtn.addEventListener("click", loadProducts);
+
+
+        document.addEventListener("click", async (e) => {
+          if (!e.target.classList.contains("add-cart-btn")) return;
+
+            e.stopPropagation();
+
+          const productId = e.target.dataset.id;
+          const token = getToken();
+
+          if (!token) {
+            alert("Please login first to add items to cart.");
+            return;
+          }
+
+          try {
+            const res = await fetch(CART_ADD_ENDPOINT, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                productId: Number(productId),
+                quantity: 1
+              })
+            });
+
+            if (!res.ok) {
+              throw new Error(`HTTP ${res.status}`);
+            }
+            await refreshCart();
+            alert("Product added to cart ✔");
+          } catch (err) {
+            alert("Error adding to cart: " + err);
+          }
+        });
+
+    // Cart UI elements
+    const openCart = document.getElementById("openCart");
+    const cartDialog = document.getElementById("cartDialog");
+    const cartClose = document.getElementById("cartClose");
+    const cartList = document.getElementById("cartList");
+    const cartCount = document.getElementById("cartCount");
+    const clearCartBtn = document.getElementById("clearCartBtn");
+    const cartTotal = document.getElementById("cartTotal");
+    const cartMsg = document.getElementById("cartMsg");
+
+    function showCartMsg(text, isError=false){
+      cartMsg.style.display = "inline-block";
+      cartMsg.textContent = text;
+      cartMsg.style.borderColor = isError ? "rgba(255,120,120,.35)" : "rgba(255,255,255,.12)";
+      cartMsg.style.color = isError ? "rgba(255,200,200,.92)" : "var(--muted)";
+    }
+
+    async function fetchCartItems(){
+      const token = getToken();
+      if(!token) return [];
+
+      const res = await fetch(CART_LIST_ENDPOINT, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if(!res.ok) throw new Error(`Cart list failed: HTTP ${res.status}`);
+      return await res.json(); // List<CartItemDto>
+    }
+
+    function calcTotal(items){
+      return items.reduce((sum, it) => sum + (Number(it.priceSnapshot) * Number(it.quantity)), 0);
+    }
+
+    function updateCartBadge(items){
+      const totalQty = items.reduce((sum, it) => sum + Number(it.quantity), 0);
+      cartCount.textContent = String(totalQty);
+    }
+
+    function renderCart(items){
+      if(!items.length){
+        cartList.innerHTML = `<div class="state">Cart is empty.</div>`;
+        cartTotal.textContent = `Total: ${fmtPrice(0)}`;
+        return;
+      }
+
+      const html = items.map(it => `
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,.06);">
+          <div style="min-width:0;">
+            <div style="font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+              ${safeText(it.productName, "Unknown")}
+            </div>
+            <div class="muted" style="font-size:12px;">
+              ${fmtPrice(it.priceSnapshot)} · ProductId: ${it.productId}
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button class="btn qty-btn" data-action="DECREMENT" data-id="${it.productId}">−</button>
+            <span class="pill">${it.quantity}</span>
+            <button class="btn qty-btn" data-action="INCREMENT" data-id="${it.productId}">+</button>
+            <button class="btn remove-btn" data-id="${it.productId}">Remove</button>
+          </div>
+        </div>
+      `).join("");
+
+      cartList.innerHTML = html;
+      cartTotal.textContent = `Total: ${fmtPrice(calcTotal(items))}`;
+    }
+
+    async function refreshCart(){
+      if(!getToken()){
+        cartCount.textContent = "0";
+        return;
+      }
+      try{
+        const items = await fetchCartItems();
+        updateCartBadge(items);
+        renderCart(items);
+      } catch(e){
+        showCartMsg(String(e), true);
+      }
+    }
+
+    openCart.addEventListener("click", async () => {
+  if(!getToken()){
+    alert("Please login first to view cart.");
+    return;
+  }
+  await refreshCart();
+  cartDialog.showModal();
+});
+
+cartClose.addEventListener("click", () => cartDialog.close());
+
+clearCartBtn.addEventListener("click", async () => {
+  try{
+    const token = getToken();
+    const res = await fetch(CART_CLEAR_ENDPOINT, {
+      method:"DELETE",
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if(!res.ok) throw new Error(`Clear failed: HTTP ${res.status}`);
+    await refreshCart();
+  } catch(e){
+    showCartMsg(String(e), true);
+  }
+});
+
+// Handle + / - and Remove inside cart dialog
+cartList.addEventListener("click", async (e) => {
+  const token = getToken();
+  if(!token) return;
+
+  const qtyBtn = e.target.closest(".qty-btn");
+  const removeBtn = e.target.closest(".remove-btn");
+
+  try{
+    if(qtyBtn){
+      const productId = Number(qtyBtn.dataset.id);
+      const action = qtyBtn.dataset.action; // INCREMENT/DECREMENT
+
+      const res = await fetch(CART_UPDATE_ENDPOINT(productId), {
+        method:"PUT",
+        headers: {
+          "Content-Type":"application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ updateAction: action })
+      });
+
+      if(!res.ok) throw new Error(`Update failed: HTTP ${res.status}`);
+      await refreshCart();
+      return;
+    }
+
+    if(removeBtn){
+      const productId = Number(removeBtn.dataset.id);
+      const res = await fetch(CART_DELETE_ENDPOINT(productId), {
+        method:"DELETE",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if(!res.ok) throw new Error(`Remove failed: HTTP ${res.status}`);
+      await refreshCart();
+      return;
+    }
+  } catch(err){
+    showCartMsg(String(err), true);
+  }
+});
+
+
 
     // init
     refreshAuthUI();

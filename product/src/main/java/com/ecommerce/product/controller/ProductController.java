@@ -2,14 +2,13 @@ package com.ecommerce.product.controller;
 
 
 import com.ecommerce.product.model.Product;
+import com.ecommerce.product.model.dto.ProductBasisDto;
 import com.ecommerce.product.model.dto.ProductDTO;
 import com.ecommerce.product.service.imp.ProductService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -30,5 +29,20 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<Product>> getProducts() {
         return ResponseEntity.ok(productService.getProducts());
+    }
+
+    @GetMapping("/getPrice/{id}")
+    public BigDecimal getPriceById(@PathVariable("id") Long id){
+        return productService.getPriceById(id);
+    }
+    @GetMapping("/getName/{id}")
+    public String getNameById(@PathVariable("id") Long id){
+        return productService.getNameById(id);
+
+    }
+
+    @GetMapping("/getName")
+    public List<ProductBasisDto> getNames(@RequestParam List<Long> ids) {
+        return productService.getNamesByIds(ids);
     }
 }
