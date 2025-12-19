@@ -241,6 +241,10 @@
                 <button id="openCart" class="btn">
                     🛒 Cart <span id="cartCount" class="pill" style="margin-left:8px;">0</span>
                 </button>
+                <button id="openOrders" class="btn">
+                    📦 Orders <span id="ordersCount" class="pill" style="margin-left:8px;">0</span>
+                </button>
+
                 <input id="search" class="input" placeholder="Search products (name / brand / category)..." />
                 <select id="category" class="select">
                     <option value="">All categories</option>
@@ -322,6 +326,7 @@
         <div id="authMsg" class="pill" style="margin-top:12px; display:none;"></div>
     </div>
 </dialog>
+
 <dialog id="cartDialog">
     <div style="padding:18px;">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
@@ -332,35 +337,62 @@
         <div id="cartList" style="margin-top:12px;"></div>
 
         <div style="display:flex; justify-content:space-between; gap:10px; margin-top:12px;">
-            <button id="clearCartBtn" class="btn">Clear cart</button>
-            <div id="cartTotal" class="pill">Total: 0 €</div>
+
+            <div style="display:flex; justify-content:space-between; gap:10px; margin-top:12px;">
+                <button id="clearCartBtn" class="btn">Clear cart</button>
+                <button id="checkoutBtn" class="btn accent">Checkout</button>
+                <div id="cartTotal" class="pill">Total: 0 €</div>
+            </div>
+
         </div>
 
         <div id="cartMsg" class="pill" style="margin-top:12px; display:none;"></div>
     </div>
 </dialog>
 
+<dialog id="ordersDialog">
+    <div style="padding:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+            <div style="font-weight:800; font-size:18px;">My Orders</div>
+            <button class="close" id="ordersClose">Close</button>
+        </div>
+
+        <div id="ordersList" style="margin-top:12px;"></div>
+        <div id="ordersMsg" class="pill" style="margin-top:12px; display:none;"></div>
+    </div>
+</dialog>
+
+
 <script>
     // =========================
     // ✅ CONFIG (change here)
     // =========================
+    const GATEWAY = "http://localhost:8080";
+
 
     // User/Auth Service (your controller: /api/ecommerce/user)
-    const USER_API_BASE = "http://localhost:8082/api/ecommerce/user";
+    const USER_API_BASE = `${GATEWAY}/api/ecommerce/user`;
     const REGISTER_ENDPOINT = `${USER_API_BASE}/register`;
     const LOGIN_ENDPOINT    = `${USER_API_BASE}/login`;
     const USER_KEY = "ecom_user";
 
     // Cart Service
-    const CART_API_BASE = "http://localhost:8083/api/ecommerce/cart";
-
+    const CART_API_BASE = `${GATEWAY}/api/ecommerce/cart`;
     const CART_LIST_ENDPOINT   = `${CART_API_BASE}/items`;
     const CART_ADD_ENDPOINT    = `${CART_API_BASE}/items`;
     const CART_CLEAR_ENDPOINT  = `${CART_API_BASE}/clear`;
     const CART_DELETE_ENDPOINT = (productId) => `${CART_API_BASE}/deleteById/${productId}`;
     const CART_UPDATE_ENDPOINT = (productId) => `${CART_API_BASE}/items/${productId}`;
 
+    // Order Service
+    const ORDER_API_BASE = `${GATEWAY}/api/ecommerce/order`;
+    const ORDER_CHECKOUT_ENDPOINT = `${ORDER_API_BASE}/checkout`;
+    const ORDER_LIST_ENDPOINT = `${ORDER_API_BASE}/orders`;
+    const ORDER_DETAIL_ENDPOINT = (orderId) => `${ORDER_API_BASE}/order/${orderId}`;
 
+   // Product Service:
+    const PRODUCT_API_BASE = `${GATEWAY}`;
+    const PRODUCT_LIST_ENDPOINT = `${PRODUCT_API_BASE}/api/product`;
 
 
     function setUser(user) {
@@ -375,16 +407,6 @@
     function clearUser() {
       localStorage.removeItem(USER_KEY);
     }
-
-
-    // Product Service:
-    // - If your product service runs on 8081 and endpoint is /api/product, then keep this.
-    // - If it is /api/products, change it.
-    const PRODUCT_API_BASE = "http://localhost:8081";
-    const PRODUCT_LIST_ENDPOINT = `${PRODUCT_API_BASE}/api/product`; // <-- change if needed
-
-    // Images are served by product service from /images/...
-    // Example: PRODUCT_API_BASE + "/images/tshirt.jpg"
 
     // =========================
     // Token storage
@@ -881,7 +903,176 @@ cartList.addEventListener("click", async (e) => {
   }
 });
 
+// =========================
+// Orders UI
+// =========================
+const openOrders = document.getElementById("openOrders");
+const ordersDialog = document.getElementById("ordersDialog");
+const ordersClose = document.getElementById("ordersClose");
+const ordersList = document.getElementById("ordersList");
+const ordersMsg = document.getElementById("ordersMsg");
+const ordersCount = document.getElementById("ordersCount");
+const checkoutBtn = document.getElementById("checkoutBtn");
 
+function showOrdersMsg(text, isError=false){
+  ordersMsg.style.display = "inline-block";
+  ordersMsg.textContent = text;
+  ordersMsg.style.borderColor = isError ? "rgba(255,120,120,.35)" : "rgba(255,255,255,.12)";
+  ordersMsg.style.color = isError ? "rgba(255,200,200,.92)" : "var(--muted)";
+}
+
+async function fetchOrders(){
+  const token = getToken();
+  if(!token) return [];
+  const res = await fetch(ORDER_LIST_ENDPOINT, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  if(!res.ok) throw new Error(`Orders failed: HTTP ${res.status}`);
+  return await res.json(); // List<OrderResponseDto>
+}
+
+async function fetchOrderItems(orderId){
+  const token = getToken();
+  const res = await fetch(ORDER_DETAIL_ENDPOINT(orderId), {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  if(!res.ok) throw new Error(`Order detail failed: HTTP ${res.status}`);
+  return await res.json(); // List<OrderItem> (senin endpoint böyle dönüyor)
+}
+
+function renderOrders(orders){
+  ordersCount.textContent = String(orders.length);
+
+  if(!orders.length){
+    ordersList.innerHTML = `<div class="state">No orders yet.</div>`;
+    return;
+  }
+
+  const html = orders.map(o => `
+    <div style="padding:12px 0; border-bottom:1px solid rgba(255,255,255,.06);">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <div style="font-weight:800;">
+          Order #${o.orderId}
+          <span class="pill" style="margin-left:10px;">${o.status}</span>
+        </div>
+        <div class="pill">${fmtPrice(o.totalAmount)}</div>
+      </div>
+
+      <div class="muted" style="margin-top:6px; display:flex; justify-content:space-between; gap:10px;">
+        <div>Items: ${(o.items || []).length}</div>
+        <button class="btn" data-action="DETAIL" data-id="${o.orderId}">Details</button>
+      </div>
+
+      <div id="orderItems-${o.orderId}" style="display:none; margin-top:8px;"></div>
+    </div>
+  `).join("");
+
+  ordersList.innerHTML = html;
+}
+
+async function refreshOrders(){
+  try{
+    const orders = await fetchOrders();
+    renderOrders(orders);
+  } catch(e){
+    showOrdersMsg(String(e), true);
+  }
+}
+
+openOrders.addEventListener("click", async () => {
+  if(!getToken()){
+    alert("Please login first to view orders.");
+    return;
+  }
+  await refreshOrders();
+  ordersDialog.showModal();
+});
+
+ordersClose.addEventListener("click", () => ordersDialog.close());
+
+ordersList.addEventListener("click", async (e) => {
+  const btn = e.target.closest("button[data-action='DETAIL']");
+  if(!btn) return;
+
+  const orderId = Number(btn.dataset.id);
+  const box = document.getElementById(`orderItems-${orderId}`);
+
+  // toggle
+  if(box.style.display === "block"){
+    box.style.display = "none";
+    box.innerHTML = "";
+    btn.textContent = "Details";
+    return;
+  }
+
+  try{
+    btn.textContent = "Loading...";
+    const items = await fetchOrderItems(orderId);
+
+    if(!items.length){
+      box.innerHTML = `<div class="state">No items found for this order.</div>`;
+    } else {
+      box.innerHTML = items.map(it => `
+        <div style="display:flex; justify-content:space-between; gap:10px; padding:6px 0;">
+          <div style="min-width:0;">
+            <div style="font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+              ${safeText(it.productName, "Unknown")}
+            </div>
+            <div class="muted" style="font-size:12px;">
+              ${fmtPrice(it.unitPrice)} × ${it.quantity} · productId: ${it.productId}
+            </div>
+          </div>
+          <div class="pill">
+            ${fmtPrice(Number(it.unitPrice) * Number(it.quantity))}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    box.style.display = "block";
+    btn.textContent = "Hide";
+  } catch(err){
+    btn.textContent = "Details";
+    showOrdersMsg(String(err), true);
+  }
+});
+
+// =========================
+// Checkout button (Cart -> Order)
+// =========================
+checkoutBtn.addEventListener("click", async () => {
+  const token = getToken();
+  if(!token){
+    alert("Please login first.");
+    return;
+  }
+
+  try{
+    showCartMsg("Checking out...");
+    const res = await fetch(ORDER_CHECKOUT_ENDPOINT, {
+      method:"POST",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if(!res.ok){
+      const txt = await res.text();
+      throw new Error(`Checkout failed: HTTP ${res.status} - ${txt}`);
+    }
+
+    const data = await res.json(); // { orderId: ... }
+    showCartMsg(`✅ Order created. OrderId: ${data.orderId}`, false);
+
+    // Cart temizleniyor (backend zaten clear yapıyor), UI güncelle
+    await refreshCart();
+    await refreshOrders(); // orders badge güncellensin
+  } catch(e){
+    showCartMsg(String(e), true);
+  }
+});
+
+console.log(getToken());
 
     // init
     refreshAuthUI();

@@ -10,16 +10,15 @@ import org.springframework.http.HttpMethod;
 public class SecurityConfig {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {}) // Enable CORS on the Security side
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ✅ preflight
-                        .requestMatchers("/api/ecommerce/user/**").permitAll() // register/login open
+                        .requestMatchers("/api/ecommerce/user/register", "/api/ecommerce/user/login").permitAll()
                         .anyRequest().authenticated()
                 )
                 .build();
     }
+
 }
 

@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/ecommerce/user")
-@CrossOrigin(origins = "*")
 public class UserController {
 
     private final UserService service;

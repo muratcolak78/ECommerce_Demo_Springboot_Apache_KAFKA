@@ -3,7 +3,9 @@ package com.ecommerce.cart.service.impl;
 import com.ecommerce.cart.model.*;
 import com.ecommerce.cart.repository.CartRepository;
 import com.ecommerce.cart.service.CartService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import java.math.BigDecimal;
@@ -92,6 +94,8 @@ public class CartServiceImpl  implements CartService {
 
     }
     // delete cart by userid and productid
+    @Modifying
+    @Transactional
     @Override
     public void deleteByUserIdAndProductId(Long userId, Long productId) {
         CartItem cartItem=repository.findByUserIdAndProductId(userId, productId)
@@ -100,6 +104,7 @@ public class CartServiceImpl  implements CartService {
     }
 
     // delete all cart items by user id
+    @Transactional
     @Override
     public void cartClear(Long userId) {
         repository.deleteByUserId(userId);
