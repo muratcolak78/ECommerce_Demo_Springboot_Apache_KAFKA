@@ -1,7 +1,4 @@
  E-Commerce Microservices Demo (Java Spring Boot + SQLite + JWT)
- 
-
-![E-Commerce Microservices Demo](https://github.com/user-attachments/assets/15b94c8a-0c79-4a97-a6ff-aa4d005b0fd6)
 
 cart service added 
 
@@ -12,6 +9,8 @@ order service added
 
 Payment service added
 ![paymentservice2](https://github.com/user-attachments/assets/daaaccce-7dcc-4aba-8e6f-82d98de79344)
+
+
 
 Projektübersicht
 
@@ -158,17 +157,7 @@ Bestellverwaltung
 
 Status-Tracking (CREATED, PAID, SHIPPED)
 
-RabbitMQ Integration
 
-Asynchrone Kommunikation
-
-Events wie:
-
-ORDER_CREATED
-
-STOCK_UPDATED
-
-EMAIL_NOTIFICATION
 
 Search AI Service (lokal, Python)
 
