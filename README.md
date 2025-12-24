@@ -1,4 +1,9 @@
  E-Commerce Microservices Demo (Java Spring Boot + SQLite + JWT)
+inventory service added.
+
+architektonische Struktur
+
+![arthitect](https://github.com/user-attachments/assets/843310cb-ba18-45ac-8e1a-6918e50e59d6)
 
 cart service added 
 
