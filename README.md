@@ -1,4 +1,7 @@
  E-Commerce Microservices Demo (Java Spring Boot + SQLite + JWT)
+email service mit KI
+
+![mailServiceMitKi](https://github.com/user-attachments/assets/301d8d09-6a8f-4ddd-956d-e16a71188e11)
 
 shipping service added
 ![shipping](https://github.com/user-attachments/assets/5296cf4f-6580-4981-8d89-1f2193debd91)
