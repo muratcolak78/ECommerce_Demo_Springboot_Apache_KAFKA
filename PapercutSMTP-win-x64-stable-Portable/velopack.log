@@ -1,0 +1,145 @@
+[stub:16200] [12:36:47] [INFO] --
+[stub:16200] [12:36:47] [INFO] Starting Velopack Stub (at "C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\Papercut SMTP.exe")
+[stub:16200] [12:36:47] [INFO] Stub about to start Update.exe (C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\Update.exe) with args: ["start", "--"]
+[stub:16200] [12:36:47] [INFO] Successfully started Update.exe
+[update:22080] [12:36:47] [INFO] --
+[update:22080] [12:36:47] [INFO] Starting Velopack Updater (0.0.1298)
+[update:22080] [12:36:47] [INFO]     Location: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\Update.exe
+[update:22080] [12:36:47] [INFO]     CWD: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable
+[update:22080] [12:36:47] [INFO]     Verbose: false
+[update:22080] [12:36:47] [INFO]     Silent: false
+[update:22080] [12:36:47] [INFO]     Log File: None
+[update:22080] [12:36:47] [INFO] Command: Start
+[update:22080] [12:36:47] [INFO]     Wait: NoWait
+[update:22080] [12:36:47] [INFO]     Exe Name: None
+[update:22080] [12:36:47] [INFO]     Exe Args: None
+[update:22080] [12:36:47] [INFO] Auto-locating app manifest...
+[update:22080] [12:36:47] [INFO] About to launch: '"C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\current\\Papercut.exe"' in dir '"C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\current"'
+[lib-csharp:15332] [12:36:50] [Information] Initialising WindowsVelopackLocator
+[lib-csharp:15332] [12:36:50] [Information] WindowsVelopackLocator: Update.exe in parent dir, Located valid manifest file at: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\current\sq.version
+[lib-csharp:15332] [12:36:50] [Information] Initialised WindowsVelopackLocator for PapercutSMTP v7.6.2
+[lib-csharp:15332] [12:36:50] [Information] Starting VelopackApp.Run (library version 0.0.1298).
+[lib-csharp:15332] [12:36:50] [Information] Setting current process explicit AppUserModelID to 'velopack.PapercutSMTP'
+[lib-csharp:15332] [12:36:58] [Warning] No staging userId in file 'C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\packages\.betaId', creating a new one.
+[lib-csharp:15332] [12:36:58] [Information] Generated new staging userId: 0f2ed9ae-bd12-41ef-b790-0bbcc47ca5c4
+[lib-csharp:15332] [12:36:58] [Debug] Retrieving latest release feed.
+[lib-csharp:15332] [12:37:01] [Trace] System.ArgumentException: Could not find asset called 'releases.win-x64-stable.json' in GitHub Release '6.2.0'.
+   at Velopack.Sources.GithubSource.GetAssetUrlFromName(GithubRelease release, String assetName)
+   at Velopack.Sources.GitBase`1.GetReleaseFeed(IVelopackLogger logger, String appId, String channel, Nullable`1 stagingId, VelopackAsset latestLocalRelease)
+[lib-csharp:15332] [12:37:01] [Trace] System.ArgumentException: Could not find asset called 'releases.win-x64-stable.json' in GitHub Release '6.1.1'.
+   at Velopack.Sources.GithubSource.GetAssetUrlFromName(GithubRelease release, String assetName)
+   at Velopack.Sources.GitBase`1.GetReleaseFeed(IVelopackLogger logger, String appId, String channel, Nullable`1 stagingId, VelopackAsset latestLocalRelease)
+[lib-csharp:15332] [12:37:01] [Trace] System.ArgumentException: Could not find asset called 'releases.win-x64-stable.json' in GitHub Release '6.0.0'.
+   at Velopack.Sources.GithubSource.GetAssetUrlFromName(GithubRelease release, String assetName)
+   at Velopack.Sources.GitBase`1.GetReleaseFeed(IVelopackLogger logger, String appId, String channel, Nullable`1 stagingId, VelopackAsset latestLocalRelease)
+[lib-csharp:15332] [12:37:01] [Information] No updates, remote version (7.6.2) is not newer than current version (7.6.2) and / or downgrade is not enabled.
+[stub:26088] [12:47:08] [INFO] --
+[stub:26088] [12:47:08] [INFO] Starting Velopack Stub (at "C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\Papercut SMTP.exe")
+[stub:26088] [12:47:08] [INFO] Stub about to start Update.exe (C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\Update.exe) with args: ["start", "--"]
+[stub:26088] [12:47:09] [INFO] Successfully started Update.exe
+[update:13900] [12:47:09] [INFO] --
+[update:13900] [12:47:09] [INFO] Starting Velopack Updater (0.0.1298)
+[update:13900] [12:47:09] [INFO]     Location: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\Update.exe
+[update:13900] [12:47:09] [INFO]     CWD: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable
+[update:13900] [12:47:09] [INFO]     Verbose: false
+[update:13900] [12:47:09] [INFO]     Silent: false
+[update:13900] [12:47:09] [INFO]     Log File: None
+[update:13900] [12:47:09] [INFO] Command: Start
+[update:13900] [12:47:09] [INFO]     Wait: NoWait
+[update:13900] [12:47:09] [INFO]     Exe Name: None
+[update:13900] [12:47:09] [INFO]     Exe Args: None
+[update:13900] [12:47:09] [INFO] Auto-locating app manifest...
+[update:13900] [12:47:09] [INFO] About to launch: '"C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\current\\Papercut.exe"' in dir '"C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\current"'
+[lib-csharp:21428] [12:47:09] [Information] Initialising WindowsVelopackLocator
+[lib-csharp:21428] [12:47:09] [Information] WindowsVelopackLocator: Update.exe in parent dir, Located valid manifest file at: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\current\sq.version
+[lib-csharp:21428] [12:47:09] [Information] Initialised WindowsVelopackLocator for PapercutSMTP v7.6.2
+[lib-csharp:21428] [12:47:09] [Information] Starting VelopackApp.Run (library version 0.0.1298).
+[lib-csharp:21428] [12:47:09] [Information] Setting current process explicit AppUserModelID to 'velopack.PapercutSMTP'
+[stub:28648] [12:54:54] [INFO] --
+[stub:28648] [12:54:54] [INFO] Starting Velopack Stub (at "C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\Papercut SMTP.exe")
+[stub:28648] [12:54:54] [INFO] Stub about to start Update.exe (C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\Update.exe) with args: ["start", "--"]
+[stub:28648] [12:54:54] [INFO] Successfully started Update.exe
+[update:10740] [12:54:54] [INFO] --
+[update:10740] [12:54:54] [INFO] Starting Velopack Updater (0.0.1298)
+[update:10740] [12:54:54] [INFO]     Location: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\Update.exe
+[update:10740] [12:54:54] [INFO]     CWD: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable
+[update:10740] [12:54:54] [INFO]     Verbose: false
+[update:10740] [12:54:54] [INFO]     Silent: false
+[update:10740] [12:54:54] [INFO]     Log File: None
+[update:10740] [12:54:54] [INFO] Command: Start
+[update:10740] [12:54:54] [INFO]     Wait: NoWait
+[update:10740] [12:54:54] [INFO]     Exe Name: None
+[update:10740] [12:54:54] [INFO]     Exe Args: None
+[update:10740] [12:54:54] [INFO] Auto-locating app manifest...
+[update:10740] [12:54:54] [INFO] About to launch: '"C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\current\\Papercut.exe"' in dir '"C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\current"'
+[lib-csharp:27568] [12:54:55] [Information] Initialising WindowsVelopackLocator
+[lib-csharp:27568] [12:54:55] [Information] WindowsVelopackLocator: Update.exe in parent dir, Located valid manifest file at: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\current\sq.version
+[lib-csharp:27568] [12:54:55] [Information] Initialised WindowsVelopackLocator for PapercutSMTP v7.6.2
+[lib-csharp:27568] [12:54:55] [Information] Starting VelopackApp.Run (library version 0.0.1298).
+[lib-csharp:27568] [12:54:55] [Information] Setting current process explicit AppUserModelID to 'velopack.PapercutSMTP'
+[stub:10584] [13:34:54] [INFO] --
+[stub:10584] [13:34:54] [INFO] Starting Velopack Stub (at "C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\Papercut SMTP.exe")
+[stub:10584] [13:34:54] [INFO] Stub about to start Update.exe (C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\Update.exe) with args: ["start", "--"]
+[stub:10584] [13:34:54] [INFO] Successfully started Update.exe
+[update:25552] [13:34:55] [INFO] --
+[update:25552] [13:34:55] [INFO] Starting Velopack Updater (0.0.1298)
+[update:25552] [13:34:55] [INFO]     Location: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\Update.exe
+[update:25552] [13:34:55] [INFO]     CWD: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable
+[update:25552] [13:34:55] [INFO]     Verbose: false
+[update:25552] [13:34:55] [INFO]     Silent: false
+[update:25552] [13:34:55] [INFO]     Log File: None
+[update:25552] [13:34:55] [INFO] Command: Start
+[update:25552] [13:34:55] [INFO]     Wait: NoWait
+[update:25552] [13:34:55] [INFO]     Exe Name: None
+[update:25552] [13:34:55] [INFO]     Exe Args: None
+[update:25552] [13:34:55] [INFO] Auto-locating app manifest...
+[update:25552] [13:34:55] [INFO] About to launch: '"C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\current\\Papercut.exe"' in dir '"C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\current"'
+[lib-csharp:14728] [13:34:55] [Information] Initialising WindowsVelopackLocator
+[lib-csharp:14728] [13:34:55] [Information] WindowsVelopackLocator: Update.exe in parent dir, Located valid manifest file at: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\current\sq.version
+[lib-csharp:14728] [13:34:55] [Information] Initialised WindowsVelopackLocator for PapercutSMTP v7.6.2
+[lib-csharp:14728] [13:34:55] [Information] Starting VelopackApp.Run (library version 0.0.1298).
+[lib-csharp:14728] [13:34:55] [Information] Setting current process explicit AppUserModelID to 'velopack.PapercutSMTP'
+[stub:21292] [13:50:51] [INFO] --
+[stub:21292] [13:50:51] [INFO] Starting Velopack Stub (at "C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\Papercut SMTP.exe")
+[stub:21292] [13:50:51] [INFO] Stub about to start Update.exe (C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\Update.exe) with args: ["start", "--"]
+[stub:21292] [13:50:51] [INFO] Successfully started Update.exe
+[update:25996] [13:50:51] [INFO] --
+[update:25996] [13:50:51] [INFO] Starting Velopack Updater (0.0.1298)
+[update:25996] [13:50:51] [INFO]     Location: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\Update.exe
+[update:25996] [13:50:51] [INFO]     CWD: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable
+[update:25996] [13:50:51] [INFO]     Verbose: false
+[update:25996] [13:50:51] [INFO]     Silent: false
+[update:25996] [13:50:51] [INFO]     Log File: None
+[update:25996] [13:50:51] [INFO] Command: Start
+[update:25996] [13:50:51] [INFO]     Wait: NoWait
+[update:25996] [13:50:51] [INFO]     Exe Name: None
+[update:25996] [13:50:51] [INFO]     Exe Args: None
+[update:25996] [13:50:51] [INFO] Auto-locating app manifest...
+[update:25996] [13:50:51] [INFO] About to launch: '"C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\current\\Papercut.exe"' in dir '"C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\current"'
+[lib-csharp:26888] [13:50:56] [Information] Initialising WindowsVelopackLocator
+[lib-csharp:26888] [13:50:56] [Information] WindowsVelopackLocator: Update.exe in parent dir, Located valid manifest file at: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\current\sq.version
+[lib-csharp:26888] [13:50:56] [Information] Initialised WindowsVelopackLocator for PapercutSMTP v7.6.2
+[lib-csharp:26888] [13:50:56] [Information] Starting VelopackApp.Run (library version 0.0.1298).
+[lib-csharp:26888] [13:50:56] [Information] Setting current process explicit AppUserModelID to 'velopack.PapercutSMTP'
+[stub:10652] [13:53:11] [INFO] --
+[stub:10652] [13:53:11] [INFO] Starting Velopack Stub (at "C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\Papercut SMTP.exe")
+[stub:10652] [13:53:11] [INFO] Stub about to start Update.exe (C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\Update.exe) with args: ["start", "--"]
+[stub:10652] [13:53:11] [INFO] Successfully started Update.exe
+[update:27040] [13:53:11] [INFO] --
+[update:27040] [13:53:11] [INFO] Starting Velopack Updater (0.0.1298)
+[update:27040] [13:53:11] [INFO]     Location: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\Update.exe
+[update:27040] [13:53:11] [INFO]     CWD: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable
+[update:27040] [13:53:11] [INFO]     Verbose: false
+[update:27040] [13:53:11] [INFO]     Silent: false
+[update:27040] [13:53:11] [INFO]     Log File: None
+[update:27040] [13:53:11] [INFO] Command: Start
+[update:27040] [13:53:11] [INFO]     Wait: NoWait
+[update:27040] [13:53:11] [INFO]     Exe Name: None
+[update:27040] [13:53:11] [INFO]     Exe Args: None
+[update:27040] [13:53:11] [INFO] Auto-locating app manifest...
+[update:27040] [13:53:11] [INFO] About to launch: '"C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\current\\Papercut.exe"' in dir '"C:\\Users\\ColakMurat\\Downloads\\PapercutSMTP-win-x64-stable-Portable\\current"'
+[lib-csharp:5384] [13:53:13] [Information] Initialising WindowsVelopackLocator
+[lib-csharp:5384] [13:53:13] [Information] WindowsVelopackLocator: Update.exe in parent dir, Located valid manifest file at: C:\Users\ColakMurat\Downloads\PapercutSMTP-win-x64-stable-Portable\current\sq.version
+[lib-csharp:5384] [13:53:13] [Information] Initialised WindowsVelopackLocator for PapercutSMTP v7.6.2
+[lib-csharp:5384] [13:53:13] [Information] Starting VelopackApp.Run (library version 0.0.1298).
+[lib-csharp:5384] [13:53:13] [Information] Setting current process explicit AppUserModelID to 'velopack.PapercutSMTP'

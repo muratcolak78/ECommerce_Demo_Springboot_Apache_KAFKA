@@ -7,6 +7,7 @@ import com.ecommerce.events.shipping.ShippingEvent;
 import com.ecommerce.events.shipping.ShippingItemEvent;
 import com.ecommerce.order.kafka.InventoryRemovalProducer;
 import com.ecommerce.order.kafka.InventoryReservedProducer;
+import com.ecommerce.order.kafka.OrderReceivedProducer;
 import com.ecommerce.order.kafka.ShippingEventProducer;
 import com.ecommerce.order.model.*;
 import com.ecommerce.order.model.dto.*;
@@ -33,18 +34,20 @@ public class OrderServiceImpl implements OrderService {
     private final InventoryReservedProducer inventoryreservedProducer;
     private final InventoryRemovalProducer inventoryRemovalProducer;
     private final ShippingEventProducer shippingEventProducer;
+    private final OrderReceivedProducer orderReceivedProducer;
     private final static Logger LOGGER= LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Value("${cart.service.url}")
     private String CART_SERVICE_URL;
 
-    public OrderServiceImpl(OrderRepository repository, OrderItemRepository itemRepository, WebClient webClient, InventoryReservedProducer inventoryreservedProducer, InventoryRemovalProducer inventoryRemovalProducer, ShippingEventProducer shippingEventProducer) {
+    public OrderServiceImpl(OrderRepository repository, OrderItemRepository itemRepository, WebClient webClient, InventoryReservedProducer inventoryreservedProducer, InventoryRemovalProducer inventoryRemovalProducer, ShippingEventProducer shippingEventProducer, OrderReceivedProducer orderReceivedProducer) {
         this.orderRepository = repository;
         this.itemRepository = itemRepository;
         this.webClient = webClient;
         this.inventoryreservedProducer = inventoryreservedProducer;
         this.inventoryRemovalProducer = inventoryRemovalProducer;
         this.shippingEventProducer = shippingEventProducer;
+        this.orderReceivedProducer = orderReceivedProducer;
     }
 
 
@@ -162,22 +165,18 @@ public class OrderServiceImpl implements OrderService {
 
             LOGGER.info(String.format(">>> InventoryEvent is sent to Kafka -> %s ",order.getUserId()));
 
-            sendEventToShippingToSaveOrderData(order);
+            sendEventToShippingAndMailServers(order);
             LOGGER.info(String.format(">>> ShippingEvent is sent to Kafka -> %s ",order.getUserId()));
+
 
         }else if(paymentEvent.getStatus()==EventStatus.FAILED){
             order.setStatus(Status.FAILED);
         }
 
-
-
         orderRepository.save(order);
-
-
-
     }
 
-    private void sendEventToShippingToSaveOrderData(Order order) {
+    private void sendEventToShippingAndMailServers(Order order) {
             List<OrderItem> orderItemList=itemRepository.findByOrderId(order.getId());
 
             if(orderItemList.isEmpty()) throw  new IllegalStateException("OrderItems not found");
@@ -191,6 +190,7 @@ public class OrderServiceImpl implements OrderService {
             shippingEvent.setZip(order.getShippingZip());
             shippingEvent.setCountry(order.getShippingCountry());
             shippingEvent.setPhone(order.getShippingPhone()==null?"00000": order.getShippingPhone());
+            shippingEvent.setEmail(order.getEmail());
 
             for(OrderItem item:orderItemList){
                 ShippingItemEvent shippingItemEvent=new ShippingItemEvent();
@@ -202,7 +202,7 @@ public class OrderServiceImpl implements OrderService {
             }
 
             shippingEventProducer.sendShippingEvent(shippingEvent);
-
+            orderReceivedProducer.sendShippingEvent(shippingEvent);
 
     }
 

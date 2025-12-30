@@ -219,7 +219,53 @@
           margin-top:14px;
         }
         @media (max-width: 780px){ .two-cols{grid-template-columns:1fr;} }
+
+               #appHeader {
+              height: 60px;
+              background: #1f2937;
+              color: white;
+              display: flex;
+              align-items: center;
+              padding: 0 20px;
+            }
+
+            #warehouseOverlay {
+              position: fixed;
+              top: 60px;
+              left: 0;
+              width: 100%;
+              height: calc(100% - 60px);
+              background: #111827;
+              z-index: 1000;
+              overflow-y: auto;
+            }
+
+            #warehousePanel {
+              max-width: 1200px;
+              margin: 20px auto;
+              background: #0f172a;
+              padding: 20px;
+              border-radius: 8px;
+            }
+
+            .warehouse-card {
+              border: 1px solid #374151;
+              padding: 12px;
+              margin-bottom: 12px;
+              background: #020617;
+              border-radius: 6px;
+            }
+
+            .hidden {
+              display: none;
+            }
+
     </style>
+    <head>
+        <title>E-Commerce</title>
+
+    </head>
+
 </head>
 
 <body>
@@ -238,6 +284,9 @@
                 <span id="authStatus" class="pill">Not logged in</span>
                 <button id="openAuth" class="btn">Register / Login</button>
                 <button id="logoutBtn" class="btn" style="display:none;">Logout</button>
+                <button class="btn" onclick="loadWarehouse()">
+                    🏭 Warehouse
+                </button>
                 <button id="openCart" class="btn">
                     🛒 Cart <span id="cartCount" class="pill" style="margin-left:8px;">0</span>
                 </button>
@@ -259,10 +308,25 @@
 </header>
 
 <main>
+
+
     <div class="wrap">
         <div id="grid" class="grid"></div>
     </div>
 </main>
+<!-- WAREHOUSE OVERLAY (BAŞLANGIÇ) -->
+<div id="warehouseOverlay" class="hidden">
+
+    <div id="warehousePanel">
+        <h3>📦 Warehouse – Shipping List</h3>
+
+        <div id="warehouseList"></div>
+
+        <button onclick="closeWarehouse()">Close</button>
+    </div>
+
+</div>
+<!-- WAREHOUSE OVERLAY (BİTİŞ) -->
 
 <!-- Product detail dialog -->
 <dialog id="detailDialog">
@@ -1494,6 +1558,39 @@ addressContinue.addEventListener("click", async () => {
     });
 
     resultDialog.addEventListener("close", goHomeAfterResult);
+function loadWarehouse() {
+  document.getElementById("warehouseOverlay")
+          .classList.remove("hidden");
+
+  fetch("http://localhost:8080/api/ecommerce/shipping/ships")
+    .then(res => res.json())
+    .then(renderWarehouse);
+}
+
+function closeWarehouse() {
+  document.getElementById("warehouseOverlay")
+          .classList.add("hidden");
+}
+function renderWarehouse(list) {
+  const el = document.getElementById("warehouseList");
+  el.innerHTML = "";
+
+  list.forEach(s => {
+    el.innerHTML += `
+      <div class="warehouse-card">
+        <div><b>Order:</b> ${s.orderId}</div>
+        <div><b>Name:</b> ${s.fullName}</div>
+        <div><b>Address:</b> ${s.street}, ${s.zip} ${s.city}, ${s.country}</div>
+        <ul>
+          ${s.itemDtoList.map(i =>
+            `<li>${i.productName} × ${i.quantity}</li>`
+          ).join("")}
+        </ul>
+      </div>
+    `;
+  });
+}
+
 
     // =========================
     // Init

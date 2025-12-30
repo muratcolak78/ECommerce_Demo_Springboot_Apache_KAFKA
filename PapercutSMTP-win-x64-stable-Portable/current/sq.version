@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+<metadata>
+<id>PapercutSMTP</id>
+<title>Papercut SMTP</title>
+<description>Papercut SMTP</description>
+<authors>PapercutSMTP</authors>
+<version>7.6.2</version>
+<channel>win-x64-stable</channel>
+<mainExe>Papercut.exe</mainExe>
+<os>win</os>
+<rid>win</rid>
+<runtimeDependencies>net8-x64-desktop,webview2</runtimeDependencies>
+<shortcutLocations>Desktop,StartMenuRoot</shortcutLocations>
+<shortcutAmuid>velopack.PapercutSMTP</shortcutAmuid>
+<releaseNotes># Release Notes
+
+## Papercut SMTP v7.6.2 [2025-11-11]
+
+*Release replaces 7.6.1 which had a major issue with email receiving in the UI.*
+
+### New Features
+
+- **Dark Theme Support** - Added full dark theme support with automatic Windows dark mode detection and synchronization. Fixes [#228](https://github.com/ChangemakerStudios/Papercut-SMTP/issues/228) (Thanks, [wonea](https://github.com/wonea)!)
+  - System/Light/Dark base theme selection with accent color customization
+  - Automatic system dark mode detection with live theme updates
+  - AvalonEdit syntax highlighting supports both light and dark modes
+  - Theme-aware attachment icons and UI controls throughout the application
+- **IP Allowlist Support** - Added IP allowlist filtering for SMTP and HTTP connections with CIDR notation support. Fixes [#333](https://github.com/ChangemakerStudios/Papercut-SMTP/issues/333) (Thanks, [mhkarimi1383](https://github.com/mhkarimi1383)!)
+  - Configurable via `SmtpServer:AllowedIps` setting
+  - Support for individual IPs (e.g., `192.168.1.100`) and CIDR ranges (e.g., `192.168.1.0/24`)
+  - Comprehensive unit tests for IP validation and range matching
+  - Fail-closed security - blocks all connections if validation fails
+- **Dynamic Property Editor for Rules** - Replaced legacy PropertyGrid with custom MahApps.Metro-compatible dynamic property editor
+  - Reflection-based property discovery using System.ComponentModel attributes
+  - Intelligent control selection (TextBox, NumericUpDown, ToggleSwitch, PasswordBox)
+  - Category-based property organization with smart ordering
+  - Resizable GridSplitter between rules list and property editor
+  - Full dark theme support in Rules Configuration dialog
+
+### Improvements
+
+- **.NET 9.0 Upgrade** - Upgraded entire solution to .NET 9.0 for improved performance and latest framework features
+- **Theme Consistency** - Modernized UI to use dynamic theming with refreshed Options dialog and message list visuals
+- **Tab Preservation** - Selected message detail tab (Message/Body/Headers/Raw) now preserved when switching between messages
+- **Code Quality** - Fixed numerous compiler warnings and null-safety issues throughout the codebase
+- **Resource Management** - Fixed X509Certificate2Collection resource leak
+- **Docker Improvements** - Updated container and runtime images for .NET 9.0
+
+### Code Quality
+
+- Comprehensive unit tests for IP allowlist validation
+- More flexible SMTP/server startup wiring and options
+- Internal robustness improvements with clearer initialization and lifecycle handling
+- Better error handling across core components
+
+### Contributors
+
+Special thanks to [wonea](https://github.com/wonea) for requesting dark theme support and [mhkarimi1383](https://github.com/mhkarimi1383) for requesting IP allowlist functionality!
+</releaseNotes>
+<releaseNotesHtml><![CDATA[
+<h1>Release Notes</h1>
+<h2>Papercut SMTP v7.6.2 [2025-11-11]</h2>
+<p><em>Release replaces 7.6.1 which had a major issue with email receiving in the UI.</em></p>
+<h3>New Features</h3>
+<ul>
+<li><strong>Dark Theme Support</strong> - Added full dark theme support with automatic Windows dark mode detection and synchronization. Fixes <a href="https://github.com/ChangemakerStudios/Papercut-SMTP/issues/228">#228</a> (Thanks, <a href="https://github.com/wonea">wonea</a>!)
+<ul>
+<li>System/Light/Dark base theme selection with accent color customization</li>
+<li>Automatic system dark mode detection with live theme updates</li>
+<li>AvalonEdit syntax highlighting supports both light and dark modes</li>
+<li>Theme-aware attachment icons and UI controls throughout the application</li>
+</ul>
+</li>
+<li><strong>IP Allowlist Support</strong> - Added IP allowlist filtering for SMTP and HTTP connections with CIDR notation support. Fixes <a href="https://github.com/ChangemakerStudios/Papercut-SMTP/issues/333">#333</a> (Thanks, <a href="https://github.com/mhkarimi1383">mhkarimi1383</a>!)
+<ul>
+<li>Configurable via <code>SmtpServer:AllowedIps</code> setting</li>
+<li>Support for individual IPs (e.g., <code>192.168.1.100</code>) and CIDR ranges (e.g., <code>192.168.1.0/24</code>)</li>
+<li>Comprehensive unit tests for IP validation and range matching</li>
+<li>Fail-closed security - blocks all connections if validation fails</li>
+</ul>
+</li>
+<li><strong>Dynamic Property Editor for Rules</strong> - Replaced legacy PropertyGrid with custom MahApps.Metro-compatible dynamic property editor
+<ul>
+<li>Reflection-based property discovery using System.ComponentModel attributes</li>
+<li>Intelligent control selection (TextBox, NumericUpDown, ToggleSwitch, PasswordBox)</li>
+<li>Category-based property organization with smart ordering</li>
+<li>Resizable GridSplitter between rules list and property editor</li>
+<li>Full dark theme support in Rules Configuration dialog</li>
+</ul>
+</li>
+</ul>
+<h3>Improvements</h3>
+<ul>
+<li><strong>.NET 9.0 Upgrade</strong> - Upgraded entire solution to .NET 9.0 for improved performance and latest framework features</li>
+<li><strong>Theme Consistency</strong> - Modernized UI to use dynamic theming with refreshed Options dialog and message list visuals</li>
+<li><strong>Tab Preservation</strong> - Selected message detail tab (Message/Body/Headers/Raw) now preserved when switching between messages</li>
+<li><strong>Code Quality</strong> - Fixed numerous compiler warnings and null-safety issues throughout the codebase</li>
+<li><strong>Resource Management</strong> - Fixed X509Certificate2Collection resource leak</li>
+<li><strong>Docker Improvements</strong> - Updated container and runtime images for .NET 9.0</li>
+</ul>
+<h3>Code Quality</h3>
+<ul>
+<li>Comprehensive unit tests for IP allowlist validation</li>
+<li>More flexible SMTP/server startup wiring and options</li>
+<li>Internal robustness improvements with clearer initialization and lifecycle handling</li>
+<li>Better error handling across core components</li>
+</ul>
+<h3>Contributors</h3>
+<p>Special thanks to <a href="https://github.com/wonea">wonea</a> for requesting dark theme support and <a href="https://github.com/mhkarimi1383">mhkarimi1383</a> for requesting IP allowlist functionality!</p>
+
+]]></releaseNotesHtml>
+</metadata>
+</package>

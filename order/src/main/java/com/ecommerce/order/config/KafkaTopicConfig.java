@@ -27,5 +27,11 @@ public class KafkaTopicConfig {
                 .name("shipping_event")
                 .build();
     }
+    @Bean
+    public NewTopic orderReceived(){
+        return TopicBuilder
+                .name("order_received_event")
+                .build();
+    }
 
 }

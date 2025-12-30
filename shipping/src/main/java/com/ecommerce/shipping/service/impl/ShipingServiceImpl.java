@@ -5,6 +5,8 @@ import com.ecommerce.events.shipping.ShippingEvent;
 import com.ecommerce.events.shipping.ShippingItemEvent;
 import com.ecommerce.shipping.model.Shipping;
 import com.ecommerce.shipping.model.ShippingItem;
+import com.ecommerce.shipping.model.dto.ShippingDto;
+import com.ecommerce.shipping.model.dto.ShippingItemDto;
 import com.ecommerce.shipping.repository.ShippingItemRepository;
 import com.ecommerce.shipping.repository.ShippingRepository;
 import com.ecommerce.shipping.service.ShippingService;
@@ -12,8 +14,10 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,6 +76,38 @@ public class ShipingServiceImpl implements ShippingService {
         }catch (DataIntegrityViolationException e){
             LOGGER.info("Shipping and sipping items  saved, {}",e.getMessage());
         }
+
+    }
+
+    @Override
+    public List<ShippingDto> getShips() {
+      List<Shipping> shippingList=repository.findAll();
+      List<ShippingDto> shippingDtos=new ArrayList<>();
+
+      for(Shipping shipping:shippingList){
+          ShippingDto shippingDto=new ShippingDto();
+          shippingDto.setShippingId(shipping.getId());
+          shippingDto.setUserId(shipping.getUserId());
+          shippingDto.setFullName(shipping.getFullName());
+          shippingDto.setOrderId(shipping.getOrderId());
+          shippingDto.setStreet(shipping.getStreet());
+          shippingDto.setZip(shipping.getZip());
+          shippingDto.setCity(shipping.getCity());
+          shippingDto.setCountry(shipping.getCountry());
+          List<ShippingItemDto> itemDtoList=new ArrayList<>();
+          List<ShippingItem> shippingItemList=itemRepository.findByShippingId(shipping.getId());
+          for(ShippingItem shippingItem:shippingItemList){
+              ShippingItemDto shippingItemDto=new ShippingItemDto();
+              shippingItemDto.setProductName(shippingItem.getProductName());
+              shippingItemDto.setProductId(shippingItem.getProductId());
+              shippingItemDto.setQuantity(shippingItem.getQuantity());
+              itemDtoList.add(shippingItemDto);
+          }
+          shippingDto.setItemDtoList(itemDtoList);
+          shippingDtos.add(shippingDto);
+
+      }
+      return shippingDtos;
 
     }
 }

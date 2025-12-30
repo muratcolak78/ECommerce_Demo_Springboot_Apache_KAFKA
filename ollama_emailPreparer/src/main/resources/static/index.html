@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring AI Chat Arayüzü</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        input[type="text"] {
+            width: calc(100% - 100px);
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+        #responseArea {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+            white-space: pre-wrap; /* Yanıtı formatlı gösterir */
+        }
+        #loading {
+            color: #5cb85c;
+            font-style: italic;
+            margin-top: 10px;
+            display: none; /* Başlangıçta gizli */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Ollama (Qwen) Chat</h1>
+
+    <div id="inputArea">
+        <input type="text" id="userInput" placeholder="Mesajınızı buraya yazın...">
+        <button onclick="sendMessage()">Gönder</button>
+    </div>
+
+    <div id="loading">Yanıt bekleniyor...</div>
+
+    <h2>Yapay Zeka Yanıtı:</h2>
+    <div id="responseArea">Henüz bir mesaj gönderilmedi.</div>
+</div>
+
+<script>
+    // Spring Boot uygulamanızın çalıştığı adres (port numaranızı kontrol edin)
+    const CHAT_ENDPOINT = 'http://localhost:8080/chat';
+
+    async function sendMessage() {
+        const userInput = document.getElementById('userInput');
+        const responseArea = document.getElementById('responseArea');
+        const loadingIndicator = document.getElementById('loading');
+
+        const message = userInput.value.trim();
+
+        if (message === "") {
+            alert("Lütfen bir mesaj girin.");
+            return;
+        }
+
+        // Arayüzü güncelle
+        responseArea.textContent = "";
+        loadingIndicator.style.display = 'block';
+
+        try {
+            // GET isteği ile sorgu parametresini ekleyerek backend'e gönderiyoruz
+            const response = await fetch(`${CHAT_ENDPOINT}?message=${encodeURIComponent(message)}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'text/plain', // Sunucudan metin beklediğimizi belirtiyoruz
+                }
+            });
+
+            if (!response.ok) {
+                // HTTP hata kodu (4xx veya 5xx) varsa
+                throw new Error(`HTTP Hata kodu: ${response.status}`);
+            }
+
+            // Yanıtı metin olarak oku
+            const resultText = await response.text();
+
+            // Yanıtı ekrana yazdır
+            responseArea.textContent = resultText;
+
+        } catch (error) {
+            // Ağ hatası veya fetch hatası
+            responseArea.textContent = `Hata oluştu: ${error.message}. Sunucu (Spring Boot) ve Ollama'nın çalıştığından emin olun.`;
+            console.error('Fetch hatası:', error);
+        } finally {
+            // İşlem bittiğinde yüklenme göstergesini gizle
+            loadingIndicator.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>

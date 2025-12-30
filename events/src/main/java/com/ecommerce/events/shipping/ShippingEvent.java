@@ -30,6 +30,7 @@ public class ShippingEvent {
     private String country;
 
     private String phone;
+    private String email;
 
     private List<ShippingItemEvent> shippingItemEventList=new ArrayList<>();
 
